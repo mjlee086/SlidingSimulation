@@ -1,0 +1,3244 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sliding Data Algorithm Simulator</title>
+<style>
+:root{--bg:#07101c;--panel:#0d1928;--panel2:#101f31;--line:#22354a;--txt:#e8f0f8;--muted:#8da0b5;--cyan:#38d9ff;--blue:#4c8dff;--green:#32d583;--red:#ff667a;--amber:#ffbd59}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.45 "Segoe UI","Malgun Gothic",sans-serif}
+header{height:66px;background:#091522;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 22px;gap:18px;position:sticky;top:0;z-index:5}
+.logo{font-weight:800;font-size:18px;letter-spacing:.3px}.logo span{color:var(--cyan)}
+.badge{padding:4px 9px;border:1px solid #31506a;border-radius:20px;color:#9eb6cc;font-size:11px}
+.header-right{margin-left:auto;color:var(--muted);font-size:12px}
+.layout{display:grid;grid-template-columns:245px 1fr;min-height:calc(100vh - 66px)}
+aside{border-right:1px solid var(--line);background:#08131f;padding:14px;position:sticky;top:66px;height:calc(100vh - 66px)}
+.navtitle{font-size:11px;color:#647b92;text-transform:uppercase;margin:8px 9px}
+.nav button{display:block;width:100%;text-align:left;background:transparent;border:0;color:#aebfd0;padding:12px 12px;border-radius:8px;cursor:pointer;margin:2px 0}
+.nav button:hover{background:#102235}.nav button.active{background:#102c42;color:#fff;box-shadow:inset 3px 0 var(--cyan)}
+.nav b{display:inline-block;width:25px;color:var(--cyan)}
+main{padding:20px;max-width:1600px;width:100%;margin:auto}
+.page{display:none}.page.active{display:block}
+h1{font-size:24px;margin:4px 0 4px}.sub{color:var(--muted);margin-bottom:18px}
+.grid{display:grid;gap:14px}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:15px;box-shadow:0 5px 20px #0003}
+.card h3{font-size:13px;margin:0 0 12px;color:#cbd8e5}.metric{font-size:25px;font-weight:750}.unit{font-size:11px;color:var(--muted);margin-left:3px}.label{font-size:11px;color:var(--muted);margin-bottom:4px}
+canvas{width:100%;height:310px;background:#07111d;border:1px solid #1c3043;border-radius:7px;display:block}.upload-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.upload-box{display:flex;flex-direction:column;gap:5px;padding:14px;border:1px dashed #31506a;border-radius:8px;background:#091522;cursor:pointer}.upload-box:hover{border-color:#38d9ff;background:#0b1b2b}.upload-title{font-weight:700;color:#e7f4ff}.upload-desc{font-size:11px;color:#8da0b5}.upload-box input{min-width:0;padding:7px 0;border:0;background:transparent}@media(max-width:900px){.upload-grid{grid-template-columns:1fr}}
+.smallcanvas{height:220px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.row>*{margin:2px 0}
+label{color:#9db0c3;font-size:12px}.control{display:flex;align-items:center;gap:7px}
+input,select{background:#091522;color:#e7eef5;border:1px solid #30455a;border-radius:6px;padding:8px 9px;min-width:90px}
+input:focus,select:focus{outline:1px solid var(--cyan)}
+button.action{background:#12314a;border:1px solid #2a5875;color:#dff8ff;border-radius:6px;padding:8px 12px;cursor:pointer}
+button.action:hover{background:#17425f}.channel-group{display:flex;gap:5px}.channel-btn{background:#091522;border:1px solid #30455a;color:#9fb1c2;border-radius:6px;padding:8px 11px;cursor:pointer}.channel-btn:hover{background:#12283a;color:#e8f5ff}.channel-btn.active{background:#123e57;border-color:#38d9ff;color:#fff;box-shadow:0 0 0 1px #38d9ff33 inset}.graph-wrap{position:relative}.graph-tooltip{display:none;position:absolute;pointer-events:none;background:#07111b;border:1px solid #3a5268;border-radius:6px;padding:7px 9px;color:#e8f5ff;font:11px/1.5 sans-serif;white-space:nowrap;box-shadow:0 4px 14px #0008;z-index:5}.pill{border-radius:20px;padding:5px 10px;font-size:11px;border:1px solid var(--line)}
+.ok{color:var(--green);border-color:#216d4a;background:#0c2b21}.warn{color:var(--amber);border-color:#735523;background:#2b2110}.bad{color:var(--red);border-color:#73313d;background:#2b1117}
+table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:8px;border-bottom:1px solid #1e3041;text-align:right}th:first-child,td:first-child{text-align:left}th{color:#8297ab;font-weight:500}
+.kpi{display:flex;justify-content:space-between;gap:10px;align-items:end}.kpi .value{font-size:22px;font-weight:750}
+.imagebox{background:#050b12;border:1px solid #23384c;border-radius:8px;padding:8px}.imagebox img{width:100%;display:block;image-rendering:auto}
+.note{font-size:12px;color:#8fa3b7;background:#0a1623;border-left:3px solid #2b617e;padding:10px 12px;border-radius:4px}
+.stepbar{display:flex;gap:7px;margin:12px 0 16px;overflow:auto}.step{padding:7px 10px;border:1px solid var(--line);border-radius:6px;color:#8499ad;font-size:11px;white-space:nowrap}.step.on{border-color:#2d7995;color:#dff8ff;background:#0c2635}
+footer{color:#62768a;font-size:11px;padding:22px 2px;text-align:center}
+@media(max-width:900px){.layout{grid-template-columns:1fr}aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}.nav{display:flex;overflow:auto}.nav button{min-width:max-content}.g4,.g2{grid-template-columns:1fr}main{padding:12px}}
+.upload-current{margin-top:10px;padding:10px 12px;border:1px solid #28445a;border-radius:8px;background:#0b1722;color:#d8e7f2;font-weight:600}.upload-current.uploaded{border-color:#2b8a62}.upload-current.default{border-color:#38556b}.btn{padding:9px 14px;border:1px solid #36546b;background:#142636;color:#dbeaf5;border-radius:7px;cursor:pointer}.btn:hover{background:#1b3448}</style>
+</head>
+<body>
+<header><div class="logo">SLIDING <span>ALGORITHM</span></div><div class="badge">REAL DATA SIMULATOR</div><div class="header-right">Gocator 2420 · 0.014 mm/point · 2,120 points</div></header>
+<div class="layout">
+<aside><div class="navtitle">Simulation Flow</div><div class="nav">
+<button class="active" data-page="overview"><b>0</b> 데이터 개요</button>
+<button data-page="raw"><b>1</b> Raw Data</button>
+<button data-page="edge"><b>2</b> Edge 탐색</button>
+<button data-page="image"><b>3</b> Image Edge</button>
+<button data-page="slope"><b>4</b> 기울기 보정</button>
+<button data-page="calc"><b>5</b> 데이터 연산</button>
+<button data-page="judge"><b>6</b> 판정</button>
+<button data-page="manual"><b>7</b> 알고리즘 설명</button>
+</div></aside>
+<main>
+<section id="overview" class="page active">
+<h1>실제 측정 데이터 시뮬레이터</h1><div class="sub">사용자가 제공한 Top / Back 이미지와 RawData CSV를 직접 로딩한 상태</div>
+<div class="grid g4">
+<div class="card"><div class="label">센서</div><div class="metric">Gocator 2420</div><div class="label">Laser Class 3R</div></div>
+<div class="card"><div class="label">X Scale</div><div class="metric">14<span class="unit">µm / point</span></div><div class="label">FOV 약 29.7 mm</div></div>
+<div class="card"><div class="label">Raw Points</div><div class="metric">2,120</div><div class="label">CSV X range −10.164 ~ 19.558 mm</div></div>
+<div class="card"><div class="label">검출 Edge</div><div class="metric" id="ovEdge">210<span class="unit">point</span></div><div class="label" id="ovX">X = −7.224 mm</div></div>
+</div>
+<div class="grid g2" style="margin-top:14px">
+<div class="card"><h3>실제 Top 이미지</h3><div class="imagebox"><img data-top-image src="assets/Top.jpg"></div></div>
+<div class="card"><h3>실제 Back 이미지</h3><div class="imagebox"><img data-back-image src="assets/Back.jpg"></div></div>
+</div>
+<div class="card" style="margin-top:14px"><h3>현재 데이터 상태</h3><div class="row"><span class="pill ok">CSV LOADED</span><span class="pill ok">TOP IMAGE LOADED</span><span class="pill ok">BACK IMAGE LOADED</span><span class="pill">2,120 points × 3 channels</span><span class="pill">No.0 / 14:53:01 / OK</span></div></div>
+</section>
+
+<section id="raw" class="page">
+<h1>1. Raw Data</h1><div class="sub">CSV Raw Data와 Top / Back 이미지를 직접 업로드해서 시뮬레이터에 적용할 수 있습니다.</div>
+<div class="card upload-card">
+<h3>데이터 / 이미지 업로드</h3>
+<div class="upload-grid">
+<label class="upload-box"><span class="upload-title">측정 데이터 폴더</span><span class="upload-desc">여러 측정 폴더를 한 번에 선택합니다. 각 폴더 안에 CSV + Top + Back 파일을 넣어주세요.</span><input id="folderUpload" type="file" webkitdirectory directory multiple></label>
+</div>
+<div class="row" style="margin-top:12px"><div class="control"><label>데이터 세트</label><select id="datasetSelect"></select></div><span class="pill" id="datasetCount">1개 데이터</span></div>
+<div class="note" id="uploadStatus" style="margin-top:12px">기본 제공 실데이터가 로드되어 있습니다. 폴더를 선택하면 폴더 이름으로 데이터 세트를 구분합니다.</div><div class="upload-current" id="currentDataBadge">현재 표시: 기본 실데이터</div>
+</div>
+<div class="grid g4" style="margin-top:14px">
+<div class="card"><div class="label">Min</div><div class="metric" id="rawMin">-</div><div class="unit">µm</div></div><div class="card"><div class="label">Max</div><div class="metric" id="rawMax">-</div><div class="unit">µm</div></div><div class="card"><div class="label">Average</div><div class="metric" id="rawAvg">-</div><div class="unit">µm</div></div><div class="card"><div class="label">Edge 후보</div><div class="metric" id="rawEdgeInfo">210</div><div class="unit" id="rawEdgeThickness">Thickness = - µm</div></div>
+</div>
+<div class="card"><div class="row"><div class="control"><label>표시 채널</label><div class="channel-group" id="rawChannels"><button type="button" class="channel-btn active" data-channel="all">전체</button><button type="button" class="channel-btn" data-channel="thick">Total Thick</button><button type="button" class="channel-btn" data-channel="back">Back Raw</button><button type="button" class="channel-btn" data-channel="top">Top Raw</button></div></div><span class="pill" id="rawScale">X Scale 0.014 mm</span><span class="pill" id="rawViewRange">전체 구간</span></div><div class="graph-wrap"><canvas id="rawCanvas" style="cursor:crosshair"></canvas><div id="rawTooltip" class="graph-tooltip"></div></div><div id="rawLegend" class="note" style="margin-top:8px"></div><div class="note" style="margin-top:8px">그래프에서 마우스 휠로 확대/축소할 수 있습니다. 드래그하면 해당 X 구간으로 확대됩니다. 더블클릭하면 전체 구간으로 돌아옵니다. · 여러 데이터 선택 시 원본 Raw 데이터를 평균하지 않고 그대로 중첩 표시합니다.</div></div>
+<div class="note" style="margin-top:14px">이 CSV에서는 Thick가 실제로 Back − Top과 일치합니다. 따라서 Total thickness는 CSV의 Thick 채널을 사용합니다.</div>
+</section>
+
+<section id="edge" class="page">
+<h1>2. 두께 데이터에서 Edge 후보점</h1><div class="sub">Thickness를 기준으로 후보 조건을 적용하고, 조건을 만족하는 모든 후보를 확인한 뒤 첫 후보를 선택합니다. 선택 후보는 다음 단계 Image Edge의 탐색 기준으로 사용됩니다.</div>
+<div class="card"><div class="row">
+<div class="control"><label>두께값 Threshold</label><input id="thTh" type="number" step=".1" value="15"></div>
+<div class="control"><label>비교 차이 Threshold</label><input id="thDiff" type="number" step=".1" value="30"></div>
+<div class="control"><label>탐색 시작점</label><input id="thStart" type="number" value="0"></div>
+<div class="control"><label>탐색 종료점</label><input id="thEnd" type="number" value="2144"></div>
+<button class="action" id="runThEdge">Edge 후보 찾기</button><span id="edgeStatus" class="pill ok">-</span>
+</div><canvas id="edgeCanvas"></canvas></div>
+<div class="grid g2" style="margin-top:14px"><div class="card"><h3>검출 결과</h3><table><tr><th>항목</th><th>값</th></tr><tr><td>선택 Candidate Index</td><td id="candIdx">-</td></tr><tr><td>X Position</td><td id="candX">-</td></tr><tr><td>Edge Thickness</td><td id="candThickness">-</td></tr><tr><td>Difference</td><td id="candDiff">-</td></tr><tr><td>조건 만족 후보 수</td><td id="candCount">-</td></tr><tr><td>선택 방식</td><td id="candMode">-</td></tr></table></div><div class="card"><h3>탐색 결과 해석</h3><div class="note">① 탐색 구간 안에서 현재 두께가 Threshold 이상인지 확인 → ② 현재점과 비교 간격만큼 떨어진 점의 절대 두께 차이를 계산 → ③ 비교 차이 Threshold 이상이면 후보로 등록 → ④ 후보 중 첫 후보를 선택합니다. 조건 만족 후보가 없을 때는 탐색 구간에서 가장 큰 차이를 참고 후보로 표시합니다.</div></div></div>
+<div class="card" style="margin-top:14px"><h3>조건 만족 후보 목록</h3><div id="candidateList" class="note">-</div></div>
+</section>
+
+<section id="image" class="page">
+<h1>3. Image Edge</h1><div class="sub">Raw Edge 후보를 기준으로 Top / Back 이미지를 Y축 평균 밝기 프로파일로 변환하고, 후보 주변에서 밝기 변화가 큰 위치를 찾습니다.</div>
+<div class="grid g2"><div class="card"><h3>Top / Back 평균 밝기 프로파일</h3><canvas id="imgProfile" class="smallcanvas"></canvas></div><div class="card"><h3>실제 이미지</h3><div class="imagebox"><img data-top-image src="assets/Top.jpg" style="margin-bottom:8px"><img data-back-image src="assets/Back.jpg"></div></div></div>
+<div class="card" style="margin-top:14px"><div class="row"><div class="control"><label>Top Edge Threshold</label><input id="topTh" type="number" step=".1" value="20"></div><div class="control"><label>Back Edge Threshold</label><input id="backTh" type="number" step=".1" value="20"></div><div class="control"><label>탐색 범위 ±px</label><input id="imgRange" type="number" value="100"></div><button class="action" id="runImgEdge">Image Edge 찾기</button></div>
+<div class="grid g4" style="margin-top:12px"><div class="card"><div class="label">Raw 후보 X</div><div class="metric" id="imgBaseX">-</div></div><div class="card"><div class="label">Top Edge Pixel</div><div class="metric" id="topEdgePx">-</div></div><div class="card"><div class="label">Back Edge Pixel</div><div class="metric" id="backEdgePx">-</div></div><div class="card"><div class="label">탐색 결과</div><div class="metric" id="imgEdgeStatus">-</div></div></div></div>
+<div class="note" style="margin-top:14px">이미지 Edge는 Raw 후보점을 이미지 폭에 대응시킨 위치를 중심으로 탐색합니다. Top과 Back은 각각 독립적으로 밝기 변화량을 계산하며, 조건을 만족하는 첫 위치를 우선하고 없으면 해당 범위에서 최대 변화 위치를 참고값으로 사용합니다.</div>
+</section>
+
+<section id="slope" class="page">
+<h1>4. Edge 기준 구간별 기울기 보정</h1><div class="sub">Edge를 기준으로 각 구간의 두께 변화량을 계산합니다. 현재 CSV에는 PPT에서 요구하는 별도 Foil/기준면 파라미터가 없으므로, 실제 보정 전후 값과 계산 가능한 slope를 분리해서 표시합니다.</div>
+<div class="card"><div class="row"><div class="control"><label>Edge</label><input id="sEdge" type="number" value="210"></div><div class="control"><label>Angle 1</label><input id="a1" type="number" step=".1" value="2.5"></div><div class="control"><label>Angle 2</label><input id="a2" type="number" step=".1" value="5"></div><div class="control"><label>Angle 3</label><input id="a3" type="number" step=".1" value="8"></div><button class="action" id="runSlope">기울기 계산</button></div><canvas id="slopeCanvas"></canvas></div>
+<div class="grid g4" style="margin-top:14px"><div class="card"><div class="label">Slope 1</div><div class="metric" id="sl1">-</div><div class="unit">µm/mm</div></div><div class="card"><div class="label">Slope 2</div><div class="metric" id="sl2">-</div><div class="unit">µm/mm</div></div><div class="card"><div class="label">Slope 3</div><div class="metric" id="sl3">-</div><div class="unit">µm/mm</div></div><div class="card"><div class="label">X Scale</div><div class="metric">0.014<span class="unit">mm/point</span></div></div></div>
+<div class="card" style="margin-top:14px"><h3>보정 상태</h3><table><tr><th>항목</th><th>현재 상태</th></tr><tr><td>Edge 기준</td><td id="slopeEdgeInfo">-</td></tr><tr><td>구간 Index</td><td id="slopeIndexInfo">-</td></tr><tr><td>Back 보정</td><td>Foil/기준면 파라미터 입력 전 — 미적용</td></tr><tr><td>Top 보정</td><td>Foil/기준면 파라미터 입력 전 — 미적용</td></tr><tr><td>Total</td><td>Back + Top 구조로 계산 예정</td></tr></table></div>
+<div class="note" style="margin-top:14px">PPT 공식의 slope1=(p2−p1)/Angle1, slope2=(p3−p2)/Angle2, slope3=(p4−p3)/Angle3 구조를 유지합니다. 실제 보정값을 임의로 생성하지 않고, 입력된 실제 데이터에서 계산 가능한 기울기만 표시합니다.</div>
+</section>
+
+<section id="calc" class="page">
+<h1>5. 데이터 연산</h1><div class="sub">Edge를 기준으로 0~20 mm의 T/Max, 20~25 mm의 T/Center, 지정 위치의 T/Sliding 및 파생 지표를 계산합니다.</div>
+<div class="card"><div class="row"><div class="control"><label>Sliding 위치</label><input id="slidePos" type="number" step=".1" value="2.7"><span>mm</span></div><button class="action" id="runCalc">계산</button></div><canvas id="calcCanvas"></canvas></div>
+<div class="grid g4" style="margin-top:14px"><div class="card"><div class="label">T / Max (0~20mm)</div><div class="metric" id="tmax">-</div></div><div class="card"><div class="label">T / Center (20~25mm)</div><div class="metric" id="tcenter">-</div></div><div class="card"><div class="label">T / Sliding</div><div class="metric" id="tslide">-</div></div><div class="card"><div class="label">% Sliding</div><div class="metric" id="pslide">-</div></div></div>
+<div class="grid g2" style="margin-top:14px"><div class="card"><h3>계산 기준</h3><table><tr><th>항목</th><th>기준</th><th>실제 Index/X</th></tr><tr><td>T/Max</td><td>Edge ~ Edge+20 mm</td><td id="calcMaxRange">-</td></tr><tr><td>T/Center</td><td>Edge+20 ~ Edge+25 mm</td><td id="calcCenterRange">-</td></tr><tr><td>T/Sliding</td><td>Edge + 지정 위치</td><td id="calcSlidePoint">-</td></tr></table></div><div class="card"><div class="kpi"><div><div class="label">Fat-Edge</div><div class="value" id="fat">-</div></div><span id="fatPill" class="pill">-</span></div><div class="note" style="margin-top:12px">%Sliding = T/Sliding ÷ T/Center × 100<br>Fat-Edge = T/Max − T/Center</div></div></div>
+</section>
+
+<section id="judge" class="page">
+<h1>6. 데이터 판정</h1><div class="sub">Recipe / Spec과 계산 결과를 분리해 표시합니다. 현재 CSV에서 직접 계산 가능한 Total 항목과, 추가 기준값이 필요한 Top / Back 항목을 구분합니다.</div>
+<div class="grid g2"><div class="card"><h3>Recipe / Spec</h3><div class="row"><div class="control"><label>Total Fat-Edge Max</label><input id="fatSpec" type="number" step=".1" value="15"></div><span>µm</span></div><div class="row"><div class="control"><label>Total %Sliding 기준</label><input id="slideSpec" type="number" step=".1" value="83"></div><span>%</span></div><div class="note" style="margin-top:10px">Recipe 값은 모델별로 달라질 수 있으므로 입력값으로 관리합니다. 예시 기본값은 현재 시뮬레이터의 확인용 값입니다.</div></div>
+<div class="card"><h3>현재 데이터 판정 결과</h3><table><tr><th>항목</th><th>측정</th><th>기준</th><th>상태</th></tr><tr><td>Total Fat-Edge</td><td id="jFat">-</td><td id="jFatSpec">&lt; 15 µm</td><td id="jFatS">-</td></tr><tr><td>Total %Sliding</td><td id="jSlide">-</td><td id="jSlideSpec">&gt; 83%</td><td id="jSlideS">-</td></tr></table></div></div>
+<div class="card" style="margin-top:14px"><h3>Top / Back 판정 준비 상태</h3><table><tr><th>항목</th><th>상태</th></tr><tr><td>Top %Sliding</td><td>개별 코팅 두께 기준값 필요</td></tr><tr><td>Back %Sliding</td><td>개별 코팅 두께 기준값 필요</td></tr><tr><td>Total Fat-Edge</td><td id="judgeReady">계산값 사용 가능</td></tr></table><div class="note" style="margin-top:10px">현재 CSV의 Top/Back 열은 센서 절대 위치값으로 취급하고 있습니다. Foil thickness / 기준면 파라미터가 입력되기 전에는 임의의 Top/Back 코팅 두께로 변환하지 않습니다.</div></div>
+</section>
+
+<section id="manual" class="page">
+<h1>7. 알고리즘 설명</h1><div class="sub">Raw → Thickness Edge → Image Edge → Slope → Calculation → Judgment의 각 단계에서 입력·처리·출력을 확인할 수 있도록 정리했습니다.</div>
+<div class="stepbar"><div class="step on">1 Raw Data</div><div class="step">2 Thickness Edge</div><div class="step">3 Image Edge</div><div class="step">4 Slope</div><div class="step">5 Calculation</div><div class="step">6 Judgment</div></div>
+<div class="grid g2"><div class="card"><h3>처리 Flow</h3><ol><li><b>Raw Data</b> — Back / Top / Thick 취득 및 중첩 확인</li><li><b>Thickness Edge</b> — Threshold와 비교 차이로 후보 탐색</li><li><b>Image Edge</b> — Top / Back Y평균 밝기 → 후보 주변 Edge 탐색</li><li><b>Slope</b> — Edge 기준 구간별 기울기 계산 및 보정 준비</li><li><b>Calculation</b> — T/Max, T/Center, T/Sliding, %Sliding, Fat-Edge</li><li><b>Judgment</b> — Recipe / Spec과 결과 비교</li></ol></div><div class="card"><h3>현재 데이터 구조</h3><table><tr><th>항목</th><th>값</th></tr><tr><td>Target</td><td>Back / Top / Thick</td></tr><tr><td>Points</td><td>2,120</td></tr><tr><td>X Scale</td><td>0.014 mm</td></tr><tr><td>X FOV</td><td>30 mm</td></tr><tr><td>Image</td><td>2048 × 95 px</td></tr><tr><td>MD 평균</td><td>100 count (설명서 기준)</td></tr></table></div></div>
+<div class="card" style="margin-top:14px"><h3>핵심 공식</h3><div class="note">slope1=(p2−p1)/Angle1 · slope2=(p3−p2)/Angle2 · slope3=(p4−p3)/Angle3<br><br>T/Max = 0~20 mm 최대값<br>T/Center = 20~25 mm 평균값<br>T/Sliding = Edge 기준 지정 위치 값<br>%Sliding = (T/Sliding / T/Center) × 100<br>Fat-Edge = T/Max − T/Center</div></div>
+<div class="card" style="margin-top:14px"><h3>현재 구현과 추가 입력이 필요한 부분</h3><div class="note">현재 구현: 실제 CSV Raw/Thickness 탐색, 이미지 평균 밝기 프로파일, Image Edge 탐색, slope 계산, Total 계산/판정.<br>추가 입력 필요: PPT의 Foil thickness 및 기준면 파라미터가 있어야 Top / Back 개별 보정과 개별 %Sliding 판정을 임의 추정 없이 구현할 수 있습니다.</div></div>
+<footer>Sliding Data Measurement Algorithm · Real Data Prototype</footer>
+</section>
+</main></div>
+<script src="assets/data.js"></script>
+<script>
+/* =========================================================
+   SLIDING ALGORITHM SIMULATOR
+   - Raw Data : 전체/개별 데이터 중첩 표시
+   - Edge/Image/Slope/Calc/Judge : 페이지별 데이터 선택
+   ========================================================= */
+
+let D = window.SLIDING_DATA || {
+  x: [], back: [], top: [], thick: [], step: 0.014
+};
+
+let N = D.x.length;
+
+const baseData = JSON.parse(JSON.stringify(D));
+const $ = id => document.getElementById(id);
+
+let edgeIdx = 210;
+let rawChannel = 'all';
+let rawView = { xmin:null, xmax:null };
+
+let datasets = [
+  { name:'기본 실데이터', data:D }
+];
+
+let currentDatasetIndex = -1;
+
+/* 페이지별 선택 데이터 */
+const pageDataset = {
+  edge: 0,
+  image: 0,
+  slope: 0,
+  calc: 0,
+  judge: 0
+};
+
+const rawPalette = [
+  '#00d9ff',
+  '#ff6b6b',
+  '#7cff6b',
+  '#ffd166',
+  '#c77dff',
+  '#ff9f1c',
+  '#4cc9f0',
+  '#f72585'
+];
+
+
+/* =========================================================
+   공통 Plot
+   ========================================================= */
+
+function plot(canvas, series, opt={}) {
+  if(!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  const W = canvas.clientWidth || 900;
+  const H = canvas.clientHeight || 330;
+
+  const dpr = window.devicePixelRatio || 1;
+
+  canvas.width = Math.round(W*dpr);
+  canvas.height = Math.round(H*dpr);
+
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,W,H);
+
+  const allX = [];
+
+  series.forEach(s=>{
+    if(!s || !s.x) return;
+
+    for(let i=0;i<s.x.length;i++){
+      if(Number.isFinite(s.x[i])) allX.push(s.x[i]);
+    }
+  });
+
+  if(!allX.length) return;
+
+  let xmin = opt.xmin;
+  let xmax = opt.xmax;
+
+  if(!Number.isFinite(xmin)) xmin=Math.min(...allX);
+  if(!Number.isFinite(xmax)) xmax=Math.max(...allX);
+
+  if(xmax<=xmin) xmax=xmin+1;
+
+  let ymin=Infinity;
+  let ymax=-Infinity;
+
+  series.forEach(s=>{
+    if(!s || !s.y) return;
+
+    for(let i=0;i<s.y.length;i++){
+      const x=s.x[i];
+      const y=s.y[i];
+
+      if(!Number.isFinite(x) || !Number.isFinite(y)) continue;
+      if(x<xmin || x>xmax) continue;
+
+      ymin=Math.min(ymin,y);
+      ymax=Math.max(ymax,y);
+    }
+  });
+
+  if(!Number.isFinite(ymin) || !Number.isFinite(ymax)){
+    ymin=0;
+    ymax=1;
+  }
+
+  if(ymax===ymin){
+    ymax+=1;
+    ymin-=1;
+  }
+
+  const pad=(ymax-ymin)*0.08;
+  ymin-=pad;
+  ymax+=pad;
+
+  const left=58;
+  const right=18;
+  const top=18;
+  const bottom=36;
+
+  const pw=W-left-right;
+  const ph=H-top-bottom;
+
+  const X=x=>left+(x-xmin)/(xmax-xmin)*pw;
+  const Y=y=>top+(ymax-y)/(ymax-ymin)*ph;
+
+  /* 배경 */
+  ctx.fillStyle='#071018';
+  ctx.fillRect(0,0,W,H);
+
+  /* Grid */
+  ctx.strokeStyle='rgba(255,255,255,.08)';
+  ctx.lineWidth=1;
+
+  for(let i=0;i<=5;i++){
+    const xx=left+pw*i/5;
+
+    ctx.beginPath();
+    ctx.moveTo(xx,top);
+    ctx.lineTo(xx,top+ph);
+    ctx.stroke();
+  }
+
+  for(let i=0;i<=4;i++){
+    const yy=top+ph*i/4;
+
+    ctx.beginPath();
+    ctx.moveTo(left,yy);
+    ctx.lineTo(left+pw,yy);
+    ctx.stroke();
+  }
+
+  /* X = 0 기준점 */
+  if(xmin<=0 && xmax>=0){
+    const xx=X(0);
+
+    ctx.save();
+    ctx.setLineDash([6,5]);
+    ctx.strokeStyle='rgba(255,255,255,.35)';
+
+    ctx.beginPath();
+    ctx.moveTo(xx,top);
+    ctx.lineTo(xx,top+ph);
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  /* Y = 0 기준점 */
+  if(ymin<=0 && ymax>=0){
+    const yy=Y(0);
+
+    ctx.save();
+    ctx.setLineDash([6,5]);
+    ctx.strokeStyle='rgba(255,255,255,.35)';
+
+    ctx.beginPath();
+    ctx.moveTo(left,yy);
+    ctx.lineTo(left+pw,yy);
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  /* Series */
+  series.forEach(s=>{
+    if(!s || !s.x || !s.y) return;
+
+    ctx.beginPath();
+
+    let started=false;
+
+    for(let i=0;i<s.x.length;i++){
+      const x=s.x[i];
+      const y=s.y[i];
+
+      if(!Number.isFinite(x) || !Number.isFinite(y)) continue;
+      if(x<xmin || x>xmax) continue;
+
+      const px=X(x);
+      const py=Y(y);
+
+      if(!started){
+        ctx.moveTo(px,py);
+        started=true;
+      }else{
+        ctx.lineTo(px,py);
+      }
+    }
+
+    ctx.strokeStyle=s.color || '#00d9ff';
+    ctx.lineWidth=s.width || 1.5;
+    ctx.globalAlpha=s.alpha ?? 1;
+
+    ctx.stroke();
+    ctx.globalAlpha=1;
+  });
+
+  /* Axis */
+  ctx.fillStyle='rgba(255,255,255,.65)';
+  ctx.font='11px Arial';
+
+  ctx.textAlign='center';
+
+  for(let i=0;i<=5;i++){
+    const xx=left+pw*i/5;
+    const value=xmin+(xmax-xmin)*i/5;
+
+    ctx.fillText(
+      value.toFixed(2),
+      xx,
+      H-12
+    );
+  }
+
+  ctx.textAlign='right';
+
+  for(let i=0;i<=4;i++){
+    const yy=top+ph*i/4;
+    const value=ymax-(ymax-ymin)*i/4;
+
+    ctx.fillText(
+      value.toFixed(1),
+      left-8,
+      yy+4
+    );
+  }
+}
+
+
+/* =========================================================
+   페이지별 데이터 선택 UI
+   ========================================================= */
+
+function createPageDatasetSelectors(){
+
+  const defs=[
+    {page:'edge',  id:'edgeDatasetSelect',  title:'Edge 탐색 데이터 세트'},
+    {page:'image', id:'imageDatasetSelect', title:'Image Edge 데이터 세트'},
+    {page:'slope', id:'slopeDatasetSelect', title:'기울기 보정 데이터 세트'},
+    {page:'calc',  id:'calcDatasetSelect',  title:'데이터 연산 데이터 세트'},
+    {page:'judge', id:'judgeDatasetSelect', title:'판정 데이터 세트'}
+  ];
+
+  defs.forEach(def=>{
+
+    if($(def.id)) return;
+
+    const page=$(def.page);
+
+    if(!page) return;
+
+    const box=document.createElement('div');
+
+    box.className='card page-dataset-card';
+
+    box.style.marginBottom='14px';
+
+    box.innerHTML=`
+      <div style="
+        display:flex;
+        align-items:center;
+        gap:12px;
+        flex-wrap:wrap;
+      ">
+        <div style="
+          font-size:12px;
+          color:#8fa4b5;
+          min-width:190px;
+        ">
+          ${def.title}
+        </div>
+
+        <select
+          id="${def.id}"
+          style="
+            min-width:300px;
+            background:#101b24;
+            color:#fff;
+            border:1px solid #2b4050;
+            border-radius:6px;
+            padding:8px 10px;
+          "
+        ></select>
+
+        <span
+          id="${def.id}Status"
+          class="pill"
+        >
+          -
+        </span>
+      </div>
+    `;
+
+    const sub=page.querySelector('.sub');
+
+    if(sub){
+      sub.insertAdjacentElement('afterend',box);
+    }else{
+      page.prepend(box);
+    }
+
+    $(def.id).addEventListener('change',()=>{
+      pageDataset[def.page]=Number($(def.id).value);
+      renderSelectedPage(def.page);
+    });
+  });
+}
+
+
+/* =========================================================
+   데이터 세트 Select 갱신
+   ========================================================= */
+
+function fillDatasetSelect(select, selectedIndex, includeAll=false){
+
+  if(!select) return;
+
+  select.innerHTML='';
+
+  if(includeAll){
+
+    const opt=document.createElement('option');
+
+    opt.value='-1';
+    opt.textContent='전체 데이터 · 중첩 그래프';
+
+    select.appendChild(opt);
+  }
+
+  datasets.forEach((ds,i)=>{
+
+    const opt=document.createElement('option');
+
+    opt.value=String(i);
+    opt.textContent=`${i+1}. ${ds.name}`;
+
+    select.appendChild(opt);
+  });
+
+  if(selectedIndex!==undefined && selectedIndex!==null){
+    select.value=String(selectedIndex);
+  }
+}
+
+
+function refreshDatasetSelectors(){
+
+  /* Raw */
+  fillDatasetSelect(
+    $('datasetSelect'),
+    currentDatasetIndex,
+    true
+  );
+
+  /* 2~6 */
+  Object.keys(pageDataset).forEach(page=>{
+
+    const id=page+'DatasetSelect';
+
+    fillDatasetSelect(
+      $(id),
+      pageDataset[page],
+      false
+    );
+
+    const status=$(id+'Status');
+
+    if(status && datasets[pageDataset[page]]){
+      status.textContent=datasets[pageDataset[page]].name;
+      status.className='pill ok';
+    }
+  });
+
+  const count=$('datasetCount');
+
+  if(count){
+    count.textContent=`${datasets.length}개`;
+  }
+}
+
+
+/* =========================================================
+   작업 데이터 변경
+   ========================================================= */
+
+function setWorkingDataset(index){
+
+  if(index<0 || !datasets[index]) return false;
+
+  const ds=datasets[index];
+
+  D=ds.data;
+  N=D.x.length;
+
+  const metaEdge=
+    Number.isFinite(D.meta?.edgeCandidate)
+      ? D.meta.edgeCandidate
+      : 210;
+
+  edgeIdx=Math.min(
+    Math.max(0,metaEdge),
+    Math.max(0,N-1)
+  );
+
+  updateUploadImages();
+
+  return true;
+}
+
+
+/* =========================================================
+   Raw Data
+   ========================================================= */
+
+function rawBuildSeries(){
+
+  const result=[];
+
+  const selected=
+    currentDatasetIndex===-1
+      ? datasets
+      : datasets[currentDatasetIndex]
+        ? [datasets[currentDatasetIndex]]
+        : [];
+
+  selected.forEach((ds,di)=>{
+
+    const data=ds.data;
+
+    if(!data || !data.x || !data.x.length) return;
+
+    const palette=
+      rawPalette[di % rawPalette.length];
+
+    if(rawChannel==='all'){
+
+      result.push({
+        x:data.x,
+        y:data.thick,
+        color:'#00d9ff',
+        width:1.8,
+        alpha:0.9
+      });
+
+      result.push({
+        x:data.x,
+        y:data.back,
+        color:'#ffb347',
+        width:1.2,
+        alpha:0.75
+      });
+
+      result.push({
+        x:data.x,
+        y:data.top,
+        color:'#ff5c8a',
+        width:1.2,
+        alpha:0.75
+      });
+
+    }else{
+
+      let y=data.thick;
+      let color=palette;
+
+      if(rawChannel==='back'){
+        y=data.back;
+      }
+
+      if(rawChannel==='top'){
+        y=data.top;
+      }
+
+      result.push({
+        x:data.x,
+        y:y,
+        color,
+        width:1.7,
+        alpha:0.9
+      });
+    }
+  });
+
+  return result;
+}
+
+
+function rawAllRange(){
+
+  let xmin=Infinity;
+  let xmax=-Infinity;
+
+  datasets.forEach(ds=>{
+
+    if(!ds.data?.x?.length) return;
+
+    xmin=Math.min(xmin,ds.data.x[0]);
+    xmax=Math.max(
+      xmax,
+      ds.data.x[ds.data.x.length-1]
+    );
+  });
+
+  if(!Number.isFinite(xmin)) xmin=-10;
+  if(!Number.isFinite(xmax)) xmax=20;
+
+  return {xmin,xmax};
+}
+
+
+function syncRawWorkingDataset(){
+
+  const idx=
+    currentDatasetIndex>=0
+      ? currentDatasetIndex
+      : 0;
+
+  if(datasets[idx]){
+    setWorkingDataset(idx);
+  }
+}
+
+
+function rawRender(){
+
+  const canvas=$('rawCanvas');
+
+  if(!canvas) return;
+
+  syncRawWorkingDataset();
+
+  const series=rawBuildSeries();
+
+  let range;
+
+  if(rawView.xmin!==null && rawView.xmax!==null){
+
+    range={
+      xmin:rawView.xmin,
+      xmax:rawView.xmax
+    };
+
+  }else{
+
+    range=rawAllRange();
+  }
+
+  plot(
+    canvas,
+    series,
+    range
+  );
+
+  /* 통계 */
+  const statData=
+    currentDatasetIndex===-1
+      ? datasets
+      : datasets[currentDatasetIndex]
+        ? [datasets[currentDatasetIndex]]
+        : [];
+
+  const values=[];
+
+  statData.forEach(ds=>{
+    (ds.data?.thick || []).forEach(v=>{
+      if(Number.isFinite(v)) values.push(v);
+    });
+  });
+
+  if(values.length){
+
+    const min=Math.min(...values);
+    const max=Math.max(...values);
+
+    const avg=
+      values.reduce((a,b)=>a+b,0)/values.length;
+
+    if($('rawMin')) $('rawMin').textContent=min.toFixed(3);
+    if($('rawMax')) $('rawMax').textContent=max.toFixed(3);
+    if($('rawAvg')) $('rawAvg').textContent=avg.toFixed(3);
+  }
+}
+
+
+function setRawChannel(ch){
+
+  rawChannel=ch;
+
+  document
+    .querySelectorAll('#rawChannels .channel-btn')
+    .forEach(btn=>{
+      btn.classList.toggle(
+        'active',
+        btn.dataset.channel===ch
+      );
+    });
+
+  rawRender();
+}
+
+
+document
+  .querySelectorAll('#rawChannels .channel-btn')
+  .forEach(btn=>{
+    btn.addEventListener(
+      'click',
+      ()=>setRawChannel(btn.dataset.channel)
+    );
+  });
+
+
+if($('datasetSelect')){
+
+  $('datasetSelect').addEventListener(
+    'change',
+    ()=>{
+      currentDatasetIndex=
+        Number($('datasetSelect').value);
+
+      syncRawWorkingDataset();
+
+      rawView={
+        xmin:null,
+        xmax:null
+      };
+
+      rawRender();
+
+      updateUploadImages();
+
+      const ds=
+        currentDatasetIndex>=0
+          ? datasets[currentDatasetIndex]
+          : null;
+
+      if(ds){
+        setUploadStatus(
+          `Raw Data · ${ds.name} 선택`
+        );
+      }else{
+        setUploadStatus(
+          `Raw Data · ${datasets.length}개 데이터 중첩 표시`
+        );
+      }
+    }
+  );
+}
+
+
+/* =========================================================
+   업로드 데이터 이미지 연결
+   ========================================================= */
+
+function updateUploadImages(){
+
+  const top=
+    D?.topImageUrl ||
+    'assets/Top.jpg';
+
+  const back=
+    D?.backImageUrl ||
+    'assets/Back.jpg';
+
+  document
+    .querySelectorAll('[data-top-image]')
+    .forEach(img=>{
+      img.src=top;
+    });
+
+  document
+    .querySelectorAll('[data-back-image]')
+    .forEach(img=>{
+      img.src=back;
+    });
+}
+
+
+/* =========================================================
+   CSV
+   ========================================================= */
+
+function parseCsvText(text,name='data.csv'){
+
+  const lines=text
+    .split(/\r?\n/)
+    .map(x=>x.trim())
+    .filter(Boolean);
+
+  if(lines.length<3) return null;
+
+  let headerIndex=-1;
+
+  for(let i=0;i<Math.min(lines.length,20);i++){
+
+    const line=lines[i];
+
+    if(
+      line.includes('Time') &&
+      line.includes('Target')
+    ){
+      headerIndex=i;
+      break;
+    }
+  }
+
+  if(headerIndex<0) return null;
+
+  const headers=lines[headerIndex]
+    .split(',')
+    .map(x=>x.trim());
+
+  const xStart=
+    headers.findIndex(x=>
+      /^-?\d+(\.\d+)?$/.test(x)
+    );
+
+  if(xStart<0) return null;
+
+  const x=headers
+    .slice(xStart)
+    .map(Number);
+
+  const rows={};
+
+  for(let i=headerIndex+1;i<lines.length;i++){
+
+    const parts=lines[i].split(',');
+
+    if(parts.length<xStart+1) continue;
+
+    const target=
+      String(parts[5] || '')
+        .trim()
+        .toLowerCase();
+
+    const values=parts
+      .slice(xStart)
+      .map(v=>Number(v));
+
+    if(target==='back' ||
+       target==='top' ||
+       target==='thick'){
+
+      rows[target]=values;
+    }
+  }
+
+  if(
+    !rows.back ||
+    !rows.top ||
+    !rows.thick
+  ){
+    return null;
+  }
+
+  const count=Math.min(
+    x.length,
+    rows.back.length,
+    rows.top.length,
+    rows.thick.length
+  );
+
+  return {
+    x:x.slice(0,count),
+    back:rows.back.slice(0,count),
+    top:rows.top.slice(0,count),
+    thick:rows.thick.slice(0,count),
+    step:
+      x.length>1
+        ? Math.abs(x[1]-x[0])
+        : 0.014,
+    meta:{
+      name:name
+    }
+  };
+}
+
+
+/* =========================================================
+   이미지 Profile
+   ========================================================= */
+
+async function loadImageProfile(file){
+
+  return new Promise(resolve=>{
+
+    const img=new Image();
+
+    img.onload=()=>{
+
+      const canvas=document.createElement('canvas');
+
+      canvas.width=img.naturalWidth;
+      canvas.height=img.naturalHeight;
+
+      const ctx=canvas.getContext('2d');
+
+      ctx.drawImage(img,0,0);
+
+      const imageData=
+        ctx.getImageData(
+          0,
+          0,
+          canvas.width,
+          canvas.height
+        );
+
+      const profile=
+        new Array(canvas.width).fill(0);
+
+      for(let x=0;x<canvas.width;x++){
+
+        let sum=0;
+
+        for(let y=0;y<canvas.height;y++){
+
+          const p=
+            (y*canvas.width+x)*4;
+
+          const r=imageData.data[p];
+          const g=imageData.data[p+1];
+          const b=imageData.data[p+2];
+
+          sum+=(r+g+b)/3;
+        }
+
+        profile[x]=
+          sum/canvas.height;
+      }
+
+      resolve({
+        url:URL.createObjectURL(file),
+        profile
+      });
+    };
+
+    img.onerror=()=>resolve(null);
+
+    img.src=URL.createObjectURL(file);
+  });
+}
+
+
+/* =========================================================
+   업로드
+   ========================================================= */
+
+async function buildDatasetFromCsv(csvFile,groupFiles){
+
+  const text=await csvFile.text();
+
+  const data=parseCsvText(
+    text,
+    csvFile.name
+  );
+
+  if(!data) return null;
+
+  const topFile=
+    groupFiles.find(f=>
+      /top/i.test(f.name) &&
+      /\.(jpg|jpeg|png|bmp)$/i.test(f.name)
+    );
+
+  const backFile=
+    groupFiles.find(f=>
+      /back/i.test(f.name) &&
+      /\.(jpg|jpeg|png|bmp)$/i.test(f.name)
+    );
+
+  if(topFile){
+
+    const p=await loadImageProfile(topFile);
+
+    if(p){
+
+      data.topImageUrl=p.url;
+      data.topProfile=p.profile;
+    }
+  }
+
+  if(backFile){
+
+    const p=await loadImageProfile(backFile);
+
+    if(p){
+
+      data.backImageUrl=p.url;
+      data.backProfile=p.profile;
+    }
+  }
+
+  return {
+    name:
+      csvFile.name.replace(
+        /\.csv$/i,
+        ''
+      ),
+
+    data
+  };
+}
+
+
+if($('folderUpload')){
+
+  $('folderUpload').addEventListener(
+    'change',
+    async e=>{
+
+      const files=
+        Array.from(e.target.files || []);
+
+      if(!files.length) return;
+
+      const csvFiles=
+        files.filter(f=>
+          /\.csv$/i.test(f.name)
+        );
+
+      if(!csvFiles.length){
+
+        setUploadStatus(
+          'CSV 파일을 찾지 못했습니다.'
+        );
+
+        return;
+      }
+
+      const groups=new Map();
+
+      files.forEach(file=>{
+
+        const parts=
+          file.webkitRelativePath
+            ? file.webkitRelativePath.split('/')
+            : [file.name];
+
+        const folder=
+          parts.length>1
+            ? parts[parts.length-2]
+            : 'dataset';
+
+        if(!groups.has(folder)){
+          groups.set(folder,[]);
+        }
+
+        groups.get(folder).push(file);
+      });
+
+      const built=[];
+
+      for(const csv of csvFiles){
+
+        const parts=
+          csv.webkitRelativePath
+            ? csv.webkitRelativePath.split('/')
+            : [csv.name];
+
+        const folder=
+          parts.length>1
+            ? parts[parts.length-2]
+            : 'dataset';
+
+        const group=
+          groups.get(folder) || [csv];
+
+        const ds=
+          await buildDatasetFromCsv(
+            csv,
+            group
+          );
+
+        if(ds) built.push(ds);
+      }
+
+      if(!built.length){
+
+        setUploadStatus(
+          '정상적인 Raw Data CSV를 찾지 못했습니다.'
+        );
+
+        return;
+      }
+
+      datasets=built;
+
+      /* Raw는 전체 중첩 */
+      currentDatasetIndex=-1;
+
+      /* 2~6은 첫 번째 데이터 */
+      pageDataset.edge=0;
+      pageDataset.image=0;
+      pageDataset.slope=0;
+      pageDataset.calc=0;
+      pageDataset.judge=0;
+
+      setWorkingDataset(0);
+
+      refreshDatasetSelectors();
+
+      rawView={
+        xmin:null,
+        xmax:null
+      };
+
+      rawRender();
+
+      renderCurrentPage();
+
+      setUploadStatus(
+        `폴더 업로드 완료 · ${built.length}개 데이터 세트 등록 · Raw는 전체 중첩 표시`
+      );
+    }
+  );
+}
+
+
+/* =========================================================
+   Upload Status
+   ========================================================= */
+
+function setUploadStatus(text){
+
+  const el=$('uploadStatus');
+
+  if(el) el.textContent=text;
+}
+
+
+/* =========================================================
+   Edge 탐색
+   ========================================================= */
+
+function runThicknessEdge(){
+
+  if(!D || !D.x || !D.x.length){
+
+    edgeIdx=0;
+    return null;
+  }
+
+  const threshold=
+    Number($('thTh')?.value) || 0;
+
+  const diffThreshold=
+    Number($('thDiff')?.value) || 0;
+
+
+  const start=
+    Math.max(
+      0,
+      Number($('thStart')?.value) || 0
+    );
+
+const requestedEnd =
+  Number($('thEnd')?.value) || 2144;
+
+const end =
+  Math.min(
+    2144,
+    N - 2,
+    requestedEnd
+  );
+  
+  const candidates=[];
+
+  let bestAny={
+    idx:start,
+    diff:-Infinity
+  };
+
+    // 양 끝 두께를 비교하여 두꺼운 쪽을 자동으로 코팅부로 판단
+  const sampleCount = Math.min(50, Math.floor((end - start + 1) / 4));
+
+  let leftSum = 0;
+  let leftCount = 0;
+  let rightSum = 0;
+  let rightCount = 0;
+
+  for(let j=0; j<sampleCount; j++){
+
+    const lv = D.thick[start + j];
+    const rv = D.thick[end - j];
+
+    if(Number.isFinite(lv)){
+      leftSum += lv;
+      leftCount++;
+    }
+
+    if(Number.isFinite(rv)){
+      rightSum += rv;
+      rightCount++;
+    }
+  }
+
+  const leftAvg =
+    leftCount ? leftSum / leftCount : 0;
+
+  const rightAvg =
+    rightCount ? rightSum / rightCount : 0;
+
+  // 두꺼운 쪽에서 얇은 쪽으로 탐색
+  const reverse = rightAvg > leftAvg;
+
+for(
+  let i=reverse ? end : start;
+  reverse ? i>start : i<end;
+  i+=reverse ? -1 : 1
+){
+
+const a = D.thick[i];
+const b = reverse ? D.thick[i-1] : D.thick[i+1];
+
+    if(!Number.isFinite(a) ||
+       !Number.isFinite(b)) continue;
+
+    const diff=Math.abs(b-a);
+
+    if(diff>bestAny.diff){
+
+      bestAny={
+        idx:i,
+        diff
+      };
+    }
+
+    if(diff>=diffThreshold){
+
+      const thresholdOk=
+        threshold<=0 ||
+        Math.abs(a)>=threshold;
+
+      if(thresholdOk){
+
+        candidates.push({
+          idx:i,
+          x:D.x[i],
+          thickness:a,
+          diff
+        });
+      }
+    }
+  }
+
+  let result;
+
+  if(candidates.length){
+
+    result=candidates[candidates.length-1];
+
+  }else{
+
+    result={
+      idx:bestAny.idx,
+      x:D.x[bestAny.idx],
+      thickness:D.thick[bestAny.idx],
+      diff:bestAny.diff,
+      fallback:true
+    };
+  }
+
+  edgeIdx=result.idx;
+
+  /* 결과 */
+  if($('candIdx'))
+    $('candIdx').textContent=result.idx;
+
+  if($('candX'))
+    $('candX').textContent=
+      Number(result.x).toFixed(3);
+
+  if($('candThickness'))
+    $('candThickness').textContent=
+      Number(result.thickness).toFixed(3);
+
+  if($('candDiff'))
+    $('candDiff').textContent=
+      Number(result.diff).toFixed(3);
+
+  if($('candCount'))
+    $('candCount').textContent=
+      candidates.length;
+
+  if($('candMode'))
+    $('candMode').textContent=
+      result.fallback
+        ? 'Fallback · 최대 차분점'
+        : 'Threshold 후보';
+
+    if($('edgeStatus')){
+
+    $('edgeStatus').title =
+      '코팅부(두꺼운 쪽) → 무지부(얇은 쪽)';
+
+    $('edgeStatus').textContent=
+      result.fallback
+        ? 'Fallback'
+        : '후보 발견';
+
+    $('edgeStatus').className=
+      result.fallback
+        ? 'pill'
+        : 'pill ok';
+  }
+
+  if($('candidateList')){
+
+    $('candidateList').innerHTML=
+      candidates.length
+        ? candidates
+            .slice(0,50)
+            .map((c,i)=>`
+              <div style="
+                display:grid;
+                grid-template-columns:60px 90px 120px 120px;
+                gap:8px;
+                padding:5px 0;
+                border-bottom:1px solid rgba(255,255,255,.05);
+              ">
+                <span>${i+1}</span>
+                <span>${c.idx}</span>
+                <span>${c.x.toFixed(3)}</span>
+                <span>${c.diff.toFixed(3)}</span>
+              </div>
+            `)
+            .join('')
+        : '<div style="color:#8899a8">후보 없음 · 최대 차분점 사용</div>';
+  }
+
+  if($('sEdge'))
+    $('sEdge').value=edgeIdx;
+
+  /* Graph */
+  const canvas=$('edgeCanvas');
+
+  if(canvas){
+
+    plot(
+      canvas,
+      [{
+        x:D.x,
+        y:D.thick,
+        color:'#00d9ff',
+        width:1.5
+      }],
+      {
+        xmin:D.x[0],
+        xmax:D.x[N-1]
+      }
+    );
+
+    const ctx=canvas.getContext('2d');
+
+    const W=canvas.clientWidth || 900;
+    const H=canvas.clientHeight || 330;
+
+    const xmin=D.x[0];
+    const xmax=D.x[N-1];
+
+    if(xmax>xmin){
+
+      const left=58;
+      const right=18;
+      const top=18;
+      const bottom=36;
+
+      const xx=
+        left+
+        (D.x[edgeIdx]-xmin)/
+        (xmax-xmin)*
+        (W-left-right);
+
+      ctx.save();
+
+      ctx.strokeStyle='#ff5252';
+      ctx.lineWidth=2;
+
+      ctx.beginPath();
+      ctx.moveTo(xx,top);
+      ctx.lineTo(xx,H-bottom);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+  }
+
+  return result;
+}
+
+
+if($('runThEdge')){
+  $('runThEdge').onclick=()=>{
+    runThicknessEdge();
+  };
+}
+
+
+/* =========================================================
+   Image Edge
+   ========================================================= */
+
+function findProfileEdge(profile,startPx,range){
+
+  if(!profile || !profile.length){
+    return -1;
+  }
+
+  const s=Math.max(
+    0,
+    Math.floor(startPx)
+  );
+
+  const e=Math.min(
+    profile.length-2,
+    s+range
+  );
+
+  let best=-1;
+  let bestDiff=-Infinity;
+
+  for(let i=s;i<=e;i++){
+
+    const diff=
+      Math.abs(
+        profile[i+1]-profile[i]
+      );
+
+    if(diff>bestDiff){
+
+      bestDiff=diff;
+      best=i;
+    }
+  }
+
+  return best;
+}
+
+
+function findImageEdges(){
+
+  if(!D || !D.x || !D.x.length) return;
+
+  const range=
+    Math.max(
+      1,
+      Number($('imgRange')?.value) || 100
+    );
+
+  const baseX=
+    Number($('imgBaseX')?.value) ||
+    D.x[edgeIdx] ||
+    0;
+
+  const topProfile=
+    D.topProfile || [];
+
+  const backProfile=
+    D.backProfile || [];
+
+  const topPx=
+    findProfileEdge(
+      topProfile,
+      206,
+      range
+    );
+
+  const backPx=
+    findProfileEdge(
+      backProfile,
+      202,
+      range
+    );
+
+  if($('topEdgePx'))
+    $('topEdgePx').textContent=
+      topPx>=0 ? topPx : '-';
+
+  if($('backEdgePx'))
+    $('backEdgePx').textContent=
+      backPx>=0 ? backPx : '-';
+
+  if($('imgEdgeStatus')){
+
+    const ok=
+      topPx>=0 || backPx>=0;
+
+    $('imgEdgeStatus').textContent=
+      ok
+        ? 'Edge 확인'
+        : 'Profile 없음';
+
+    $('imgEdgeStatus').className=
+      ok
+        ? 'pill ok'
+        : 'pill';
+  }
+
+  imgProfileRender();
+}
+
+
+function imgProfileRender(){
+
+  const canvas=$('imgProfile');
+
+  if(!canvas) return;
+
+  const series=[];
+
+  if(D.topProfile?.length){
+
+    series.push({
+      x:D.topProfile.map((_,i)=>i),
+      y:D.topProfile,
+      color:'#ff5c8a',
+      width:1.5
+    });
+  }
+
+  if(D.backProfile?.length){
+
+    series.push({
+      x:D.backProfile.map((_,i)=>i),
+      y:D.backProfile,
+      color:'#00d9ff',
+      width:1.5
+    });
+  }
+
+  plot(
+    canvas,
+    series,
+    {
+      xmin:0,
+      xmax:
+        Math.max(
+          D.topProfile?.length || 0,
+          D.backProfile?.length || 0,
+          2048
+        )-1
+    }
+  );
+}
+
+
+if($('runImgEdge')){
+  $('runImgEdge').onclick=()=>{
+    findImageEdges();
+  };
+}
+
+
+/* =========================================================
+   기울기 보정
+   ========================================================= */
+
+function runSlope(){
+
+  if(!D || !D.x || !D.x.length) return;
+
+  edgeIdx=Math.max(
+    0,
+    Math.min(
+      N-1,
+      Number($('sEdge')?.value) || edgeIdx
+    )
+  );
+
+  const angle1=
+    Number($('a1')?.value) || 0;
+
+  const angle2=
+    Number($('a2')?.value) || 0;
+
+  const angle3=
+    Number($('a3')?.value) || 0;
+
+  const step=
+    D.step ||
+    (
+      D.x.length>1
+        ? Math.abs(D.x[1]-D.x[0])
+        : 0.014
+    );
+
+  const i0=edgeIdx;
+
+  const i1=Math.min(
+    N-1,
+    i0+Math.round(
+      Math.abs(angle1)/step
+    )
+  );
+
+  const i2=Math.min(
+    N-1,
+    i1+Math.round(
+      Math.abs(angle2)/step
+    )
+  );
+
+  const i3=Math.min(
+    N-1,
+    i2+Math.round(
+      Math.abs(angle3)/step
+    )
+  );
+
+  function slope(a,b,angle){
+
+    if(!Number.isFinite(angle) ||
+       angle===0) return 0;
+
+    return (D.thick[b]-D.thick[a])/
+      angle;
+  }
+
+  const sl1=slope(i0,i1,angle1);
+  const sl2=slope(i1,i2,angle2);
+  const sl3=slope(i2,i3,angle3);
+
+  if($('sl1'))
+    $('sl1').textContent=sl1.toFixed(5);
+
+  if($('sl2'))
+    $('sl2').textContent=sl2.toFixed(5);
+
+  if($('sl3'))
+    $('sl3').textContent=sl3.toFixed(5);
+
+  if($('slopeEdgeInfo'))
+    $('slopeEdgeInfo').textContent=
+      `Edge Index ${edgeIdx} · X ${D.x[edgeIdx].toFixed(3)} mm`;
+
+  if($('slopeIndexInfo'))
+    $('slopeIndexInfo').textContent=
+      `Index: ${i0} → ${i1} → ${i2} → ${i3}`;
+
+  const canvas=$('slopeCanvas');
+
+  if(canvas){
+
+    plot(
+      canvas,
+      [{
+        x:D.x,
+        y:D.thick,
+        color:'#00d9ff',
+        width:1.5
+      }],
+      {
+        xmin:D.x[0],
+        xmax:D.x[N-1]
+      }
+    );
+  }
+}
+
+
+if($('runSlope')){
+  $('runSlope').onclick=()=>{
+    runSlope();
+  };
+}
+
+
+/* =========================================================
+   데이터 연산
+   ========================================================= */
+
+function calc(){
+
+  if(!D || !D.x || !D.x.length) return;
+
+  const step=
+    D.step ||
+    (
+      D.x.length>1
+        ? Math.abs(D.x[1]-D.x[0])
+        : 0.014
+    );
+
+  const edgeX=D.x[edgeIdx];
+
+  const slidePos=
+    Number($('slidePos')?.value) || 2.7;
+
+  const slideTarget=
+    edgeX+slidePos;
+
+  const slideIdx=Math.max(
+    0,
+    Math.min(
+      N-1,
+      Math.round(
+        (slideTarget-D.x[0])/step
+      )
+    )
+  );
+
+  /* 0~20 mm */
+  const maxStart=edgeX;
+  const maxEnd=edgeX+20;
+
+  const maxValues=[];
+
+  for(let i=0;i<N;i++){
+
+    if(
+      D.x[i]>=maxStart &&
+      D.x[i]<=maxEnd &&
+      Number.isFinite(D.thick[i])
+    ){
+      maxValues.push(D.thick[i]);
+    }
+  }
+
+  /* 20~25 mm */
+  const centerStart=edgeX+20;
+  const centerEnd=edgeX+25;
+
+  const centerValues=[];
+
+  for(let i=0;i<N;i++){
+
+    if(
+      D.x[i]>=centerStart &&
+      D.x[i]<=centerEnd &&
+      Number.isFinite(D.thick[i])
+    ){
+      centerValues.push(D.thick[i]);
+    }
+  }
+
+  const tmax=
+    maxValues.length
+      ? Math.max(...maxValues)
+      : NaN;
+
+  const tcenter=
+    centerValues.length
+      ? centerValues.reduce(
+          (a,b)=>a+b,
+          0
+        )/centerValues.length
+      : NaN;
+
+  const tslide=
+    Number.isFinite(D.thick[slideIdx])
+      ? D.thick[slideIdx]
+      : NaN;
+
+  const pct=
+    Number.isFinite(tslide) &&
+    Number.isFinite(tcenter) &&
+    tcenter!==0
+      ? tslide/tcenter*100
+      : NaN;
+
+  const fat=
+    Number.isFinite(tmax) &&
+    Number.isFinite(tcenter)
+      ? tmax-tcenter
+      : NaN;
+
+  if($('tmax'))
+    $('tmax').textContent=
+      Number.isFinite(tmax)
+        ? `${tmax.toFixed(3)} µm`
+        : '-';
+
+  if($('tcenter'))
+    $('tcenter').textContent=
+      Number.isFinite(tcenter)
+        ? `${tcenter.toFixed(3)} µm`
+        : '-';
+
+  if($('tslide'))
+    $('tslide').textContent=
+      Number.isFinite(tslide)
+        ? `${tslide.toFixed(3)} µm`
+        : '-';
+
+  if($('pslide'))
+    $('pslide').textContent=
+      Number.isFinite(pct)
+        ? `${pct.toFixed(3)} %`
+        : '-';
+
+  if($('fat'))
+    $('fat').textContent=
+      Number.isFinite(fat)
+        ? `${fat.toFixed(3)} µm`
+        : '-';
+
+  if($('fatPill')){
+
+    $('fatPill').textContent=
+      Number.isFinite(fat)
+        ? `${fat.toFixed(3)} µm`
+        : '-';
+
+    $('fatPill').className=
+      'pill '+
+      (
+        Number.isFinite(fat) && fat<15
+          ? 'ok'
+          : ''
+      );
+  }
+
+  if($('calcMaxRange'))
+    $('calcMaxRange').textContent=
+      `${edgeX.toFixed(3)} ~ ${maxEnd.toFixed(3)} mm`;
+
+  if($('calcCenterRange'))
+    $('calcCenterRange').textContent=
+      `${centerStart.toFixed(3)} ~ ${centerEnd.toFixed(3)} mm`;
+
+  if($('calcSlidePoint'))
+    $('calcSlidePoint').textContent=
+      `X=${D.x[slideIdx].toFixed(3)} mm · Index=${slideIdx}`;
+
+  /* Judge */
+  if($('jFat'))
+    $('jFat').textContent=
+      Number.isFinite(fat)
+        ? `${fat.toFixed(3)} µm`
+        : '-';
+
+  if($('jFatSpec'))
+    $('jFatSpec').textContent=
+      $('fatSpec')?.value
+        ? `${$('fatSpec').value} µm`
+        : '15 µm';
+
+  if($('jFatS'))
+    $('jFatS').textContent=
+      Number.isFinite(fat) &&
+      fat<15
+        ? 'OK'
+        : 'NG';
+
+  if($('jSlide'))
+    $('jSlide').textContent=
+      Number.isFinite(pct)
+        ? `${pct.toFixed(3)} %`
+        : '-';
+
+  const slideSpec=
+    Number($('slideSpec')?.value) || 98;
+
+  if($('jSlideSpec'))
+    $('jSlideSpec').textContent=
+      `${slideSpec}%`;
+
+  if($('jSlideS'))
+    $('jSlideS').textContent=
+      Number.isFinite(pct) &&
+      pct>=slideSpec
+        ? 'OK'
+        : 'NG';
+
+  if($('judgeReady'))
+    $('judgeReady').textContent=
+      Number.isFinite(fat) &&
+      Number.isFinite(pct)
+        ? '판정 가능'
+        : '계산 필요';
+
+  const canvas=$('calcCanvas');
+
+  if(canvas){
+
+    plot(
+      canvas,
+      [{
+        x:D.x,
+        y:D.thick,
+        color:'#00d9ff',
+        width:1.5
+      }],
+      {
+        xmin:D.x[0],
+        xmax:D.x[N-1]
+      }
+    );
+
+    const ctx=canvas.getContext('2d');
+
+    const W=canvas.clientWidth || 900;
+    const H=canvas.clientHeight || 330;
+
+    const xmin=D.x[0];
+    const xmax=D.x[N-1];
+
+    if(xmax>xmin){
+
+      const left=58;
+      const right=18;
+      const top=18;
+      const bottom=36;
+
+      const xx=
+        left+
+        (D.x[slideIdx]-xmin)/
+        (xmax-xmin)*
+        (W-left-right);
+
+      ctx.save();
+
+      ctx.strokeStyle='#ffd166';
+      ctx.lineWidth=2;
+      ctx.setLineDash([6,4]);
+
+      ctx.beginPath();
+      ctx.moveTo(xx,top);
+      ctx.lineTo(xx,H-bottom);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+  }
+
+  return {
+    tmax,
+    tcenter,
+    tslide,
+    pct,
+    fat,
+    slideIdx
+  };
+}
+
+
+if($('runCalc')){
+  $('runCalc').onclick=()=>{
+    calc();
+  };
+}
+
+
+/* =========================================================
+   페이지별 데이터 선택 → 해당 계산 실행
+   ========================================================= */
+
+function renderSelectedPage(page){
+
+  const index=pageDataset[page];
+
+  if(!setWorkingDataset(index)) return;
+
+  if(page==='edge'){
+
+    runThicknessEdge();
+
+  }else if(page==='image'){
+
+    runThicknessEdge();
+    findImageEdges();
+
+  }else if(page==='slope'){
+
+    runThicknessEdge();
+
+    if($('sEdge'))
+      $('sEdge').value=edgeIdx;
+
+    runSlope();
+
+  }else if(page==='calc'){
+
+    runThicknessEdge();
+
+    if($('sEdge'))
+      $('sEdge').value=edgeIdx;
+
+    calc();
+
+  }else if(page==='judge'){
+
+    runThicknessEdge();
+
+    if($('sEdge'))
+      $('sEdge').value=edgeIdx;
+
+    calc();
+  }
+
+  const selector=
+    $(page+'DatasetSelect');
+
+  const status=
+    $(page+'DatasetSelectStatus');
+
+  const ds=datasets[index];
+
+  if(selector){
+    selector.value=String(index);
+  }
+
+  if(status && ds){
+    status.textContent=ds.name;
+    status.className='pill ok';
+  }
+}
+
+
+/* =========================================================
+   현재 활성 페이지 렌더
+   ========================================================= */
+
+function renderCurrentPage(){
+
+  const active=
+    document.querySelector('.page.active');
+
+  if(!active) return;
+
+  const page=active.id;
+
+  if(page==='raw'){
+
+    rawRender();
+    return;
+  }
+
+  if(
+    page==='edge' ||
+    page==='image' ||
+    page==='slope' ||
+    page==='calc' ||
+    page==='judge'
+  ){
+
+    renderSelectedPage(page);
+    return;
+  }
+
+  /* Overview */
+  if(page==='overview'){
+
+    setWorkingDataset(
+      datasets.length
+        ? 0
+        : -1
+    );
+
+    if(D?.x?.length){
+      runThicknessEdge();
+      calc();
+    }
+  }
+}
+
+
+/* =========================================================
+   Navigation
+   ========================================================= */
+
+document
+  .querySelectorAll('.nav button')
+  .forEach(button=>{
+
+    button.onclick=()=>{
+
+      document
+        .querySelectorAll('.nav button')
+        .forEach(x=>
+          x.classList.remove('active')
+        );
+
+      button.classList.add('active');
+
+      document
+        .querySelectorAll('.page')
+        .forEach(p=>
+          p.classList.remove('active')
+        );
+
+      const page=
+        $(button.dataset.page);
+
+      if(page){
+        page.classList.add('active');
+      }
+
+      requestAnimationFrame(
+        renderCurrentPage
+      );
+    };
+  });
+
+
+/* =========================================================
+   Reset
+   ========================================================= */
+
+if($('resetBtn')){
+
+  $('resetBtn').onclick=()=>{
+
+    datasets=[
+      {
+        name:'기본 실데이터',
+        data:JSON.parse(
+          JSON.stringify(baseData)
+        )
+      }
+    ];
+
+    currentDatasetIndex=-1;
+
+    pageDataset.edge=0;
+    pageDataset.image=0;
+    pageDataset.slope=0;
+    pageDataset.calc=0;
+    pageDataset.judge=0;
+
+    setWorkingDataset(0);
+
+    rawView={
+      xmin:null,
+      xmax:null
+    };
+
+    refreshDatasetSelectors();
+
+    rawRender();
+
+    renderCurrentPage();
+
+    setUploadStatus(
+      '기본 실데이터로 초기화되었습니다.'
+    );
+  };
+}
+
+
+/* =========================================================
+   Window Resize
+   ========================================================= */
+
+window.addEventListener(
+  'resize',
+  ()=>{
+    requestAnimationFrame(
+      renderCurrentPage
+    );
+  }
+);
+
+
+/* =========================================================
+   초기화
+   ========================================================= */
+
+createPageDatasetSelectors();
+
+refreshDatasetSelectors();
+
+setWorkingDataset(0);
+
+updateUploadImages();
+
+runThicknessEdge();
+
+findImageEdges();
+
+runSlope();
+
+calc();
+
+requestAnimationFrame(()=>{
+  requestAnimationFrame(()=>{
+    renderCurrentPage();
+  });
+});
+
+</script>
+</script>
+<script>
+/* ============================================================
+   V17 DATA LINK
+   Raw Data에서 업로드한 Dataset을 2~6번 전체에서 공통 사용
+   ============================================================ */
+
+(function(){
+
+  console.log('[V17] 공통 Dataset 연결 모듈 시작');
+
+  /* ------------------------------------------------------------
+     1. 현재 선택된 Dataset 가져오기
+     ------------------------------------------------------------ */
+
+  window.getCurrentDataset = function(){
+
+    if(
+      typeof datasets === 'undefined' ||
+      !Array.isArray(datasets) ||
+      datasets.length === 0
+    ){
+      return null;
+    }
+
+    if(
+      typeof currentDatasetIndex === 'number' &&
+      currentDatasetIndex >= 0 &&
+      currentDatasetIndex < datasets.length
+    ){
+      return datasets[currentDatasetIndex];
+    }
+
+    return null;
+  };
+
+
+  /* ------------------------------------------------------------
+     2. 전체 Dataset 가져오기
+     ------------------------------------------------------------ */
+
+  window.getAllDatasets = function(){
+
+    if(
+      typeof datasets === 'undefined' ||
+      !Array.isArray(datasets)
+    ){
+      return [];
+    }
+
+    return datasets;
+  };
+
+
+  /* ------------------------------------------------------------
+     3. 현재 Dataset의 데이터를 D에 연결
+     
+     핵심 부분
+     Raw Data에서 선택한 데이터 → D
+     → 2~6번이 기존 방식 그대로 사용
+     ------------------------------------------------------------ */
+
+  window.linkDatasetToAlgorithm = function(index){
+
+    if(
+      typeof datasets === 'undefined' ||
+      !Array.isArray(datasets)
+    ){
+      console.warn('[V17] datasets가 없습니다.');
+      return false;
+    }
+
+    if(
+      index < 0 ||
+      index >= datasets.length
+    ){
+      console.warn('[V17] 잘못된 Dataset index:',index);
+      return false;
+    }
+
+    const ds = datasets[index];
+
+    if(!ds || !ds.data){
+      console.warn('[V17] Dataset 데이터가 없습니다.',ds);
+      return false;
+    }
+
+    /* 현재 Dataset */
+    currentDatasetIndex = index;
+
+    /* 알고리즘 전체에서 사용할 데이터 */
+    D = ds.data;
+    N = D.x.length;
+
+    /* Edge 초기값 */
+    if(
+      D.meta &&
+      Number.isFinite(D.meta.edgeCandidate)
+    ){
+      edgeIdx = D.meta.edgeCandidate;
+    }else{
+      edgeIdx = Math.min(210,N-1);
+    }
+
+    /* Raw 그래프 확대/이동 초기화 */
+    rawView = {
+      xmin:null,
+      xmax:null
+    };
+
+    console.log(
+      '[V17] 현재 Dataset:',
+      ds.name,
+      'points:',
+      N
+    );
+
+    /* --------------------------------------------------------
+       2. Edge
+       -------------------------------------------------------- */
+    try{
+      if(typeof runThicknessEdge === 'function'){
+        runThicknessEdge();
+      }
+    }catch(e){
+      console.error('[V17] Edge 계산 오류',e);
+    }
+
+
+    /* --------------------------------------------------------
+       3. Image Edge
+       -------------------------------------------------------- */
+    try{
+      if(typeof findImageEdges === 'function'){
+        findImageEdges();
+      }
+    }catch(e){
+      console.error('[V17] Image Edge 계산 오류',e);
+    }
+
+
+    /* --------------------------------------------------------
+       4. Slope
+       -------------------------------------------------------- */
+    try{
+      if(typeof runSlope === 'function'){
+        runSlope();
+      }
+    }catch(e){
+      console.error('[V17] Slope 계산 오류',e);
+    }
+
+
+    /* --------------------------------------------------------
+       5. Calculation
+       -------------------------------------------------------- */
+    try{
+      if(typeof calc === 'function'){
+        calc();
+      }
+    }catch(e){
+      console.error('[V17] Calculation 오류',e);
+    }
+
+
+    /* --------------------------------------------------------
+       6. 화면 갱신
+       -------------------------------------------------------- */
+
+    try{
+      if(typeof refreshDatasetSelect === 'function'){
+        refreshDatasetSelect();
+      }
+    }catch(e){}
+
+    try{
+      if(typeof updateCurrentDataBadge === 'function'){
+        updateCurrentDataBadge();
+      }
+    }catch(e){}
+
+    try{
+      if(typeof updateUploadImages === 'function'){
+        updateUploadImages();
+      }
+    }catch(e){}
+
+    try{
+      if(typeof rawRender === 'function'){
+        rawRender();
+      }
+    }catch(e){}
+
+    requestAnimationFrame(function(){
+
+      requestAnimationFrame(function(){
+
+        try{
+          if(typeof renderAll === 'function'){
+            renderAll();
+          }
+        }catch(e){
+          console.error('[V17] 화면 갱신 오류',e);
+        }
+
+      });
+
+    });
+
+    /* 상태 표시 */
+    try{
+
+      if(
+        typeof setUploadStatus === 'function' &&
+        D.x &&
+        D.x.length
+      ){
+
+        setUploadStatus(
+          '현재 데이터: ' +
+          ds.name +
+          ' · ' +
+          N.toLocaleString() +
+          ' points · X ' +
+          Number(D.x[0]).toFixed(3) +
+          ' ~ ' +
+          Number(D.x[N-1]).toFixed(3) +
+          ' mm'
+        );
+
+      }
+
+    }catch(e){}
+
+    return true;
+  };
+
+
+  /* ------------------------------------------------------------
+     4. Dataset 선택 이벤트
+     
+     기존 이벤트와 충돌하지 않도록 select 자체를 복제해서
+     기존 change 이벤트를 제거한다.
+     ------------------------------------------------------------ */
+
+  function installDatasetSelector(){
+
+    const oldSelect = document.getElementById('datasetSelect');
+
+    if(!oldSelect){
+      console.warn('[V17] datasetSelect를 찾지 못했습니다.');
+      return false;
+    }
+
+    /* 이미 설치했으면 다시 설치하지 않음 */
+    if(oldSelect.dataset.v17Linked === '1'){
+      return true;
+    }
+
+    /* 기존 이벤트 제거를 위해 clone */
+    const newSelect = oldSelect.cloneNode(true);
+
+    oldSelect.parentNode.replaceChild(
+      newSelect,
+      oldSelect
+    );
+
+    newSelect.dataset.v17Linked = '1';
+
+
+    /* ----------------------------------------------------------
+       Dataset 선택
+       ---------------------------------------------------------- */
+
+    newSelect.addEventListener('change',function(){
+
+      const value = this.value;
+
+      console.log(
+        '[V17] Dataset 선택:',
+        value
+      );
+
+
+      /* ========================================================
+         전체 데이터
+         ======================================================== */
+
+      if(
+        value === 'all' ||
+        value === '-1' ||
+        value === 'ALL'
+      ){
+
+        currentDatasetIndex = -1;
+
+        console.log(
+          '[V17] 전체 Dataset 모드'
+        );
+
+        try{
+          if(typeof refreshDatasetSelect === 'function'){
+            refreshDatasetSelect();
+          }
+        }catch(e){}
+
+        try{
+          if(typeof updateCurrentDataBadge === 'function'){
+            updateCurrentDataBadge();
+          }
+        }catch(e){}
+
+        /*
+         * 전체 모드에서는 우선 Raw Data의 전체 그래프를 표시.
+         *
+         * 2~6번은 각각의 Dataset을 순서대로 계산한 뒤
+         * 마지막 계산값이 남는 방식이 되지 않도록
+         * 아래의 all-mode 함수를 사용.
+         */
+
+        runAllDatasets();
+
+        return;
+      }
+
+
+      /* ========================================================
+         개별 Dataset
+         ======================================================== */
+
+      const index = Number(value);
+
+      if(
+        Number.isInteger(index) &&
+        index >= 0 &&
+        index < datasets.length
+      ){
+
+        linkDatasetToAlgorithm(index);
+
+      }
+
+    });
+
+
+    return true;
+  }
+
+
+  /* ------------------------------------------------------------
+     5. 전체 Dataset 계산
+     
+     전체 선택 시에도 파일을 다시 읽지 않는다.
+     이미 Raw Data에 업로드되어 있는 datasets를 사용한다.
+     ------------------------------------------------------------ */
+
+  window.runAllDatasets = function(){
+
+    if(
+      typeof datasets === 'undefined' ||
+      !Array.isArray(datasets) ||
+      datasets.length === 0
+    ){
+      console.warn('[V17] 계산할 Dataset이 없습니다.');
+      return;
+    }
+
+    console.log(
+      '[V17] 전체 Dataset 계산:',
+      datasets.length,
+      '개'
+    );
+
+
+    /*
+     * 기존 알고리즘 함수는 D를 기준으로 계산하므로
+     * 각 Dataset을 차례대로 D에 연결한다.
+     */
+
+    const results = [];
+
+    datasets.forEach(function(ds,index){
+
+      if(!ds || !ds.data) return;
+
+      D = ds.data;
+      N = D.x.length;
+
+      currentDatasetIndex = index;
+
+      if(
+        D.meta &&
+        Number.isFinite(D.meta.edgeCandidate)
+      ){
+        edgeIdx = D.meta.edgeCandidate;
+      }else{
+        edgeIdx = Math.min(210,N-1);
+      }
+
+
+      try{
+        if(typeof runThicknessEdge === 'function'){
+          runThicknessEdge();
+        }
+      }catch(e){
+        console.error(
+          '[V17] 전체 Edge 오류:',
+          ds.name,
+          e
+        );
+      }
+
+
+      try{
+        if(typeof findImageEdges === 'function'){
+          findImageEdges();
+        }
+      }catch(e){
+        console.error(
+          '[V17] 전체 Image Edge 오류:',
+          ds.name,
+          e
+        );
+      }
+
+
+      try{
+        if(typeof runSlope === 'function'){
+          runSlope();
+        }
+      }catch(e){
+        console.error(
+          '[V17] 전체 Slope 오류:',
+          ds.name,
+          e
+        );
+      }
+
+
+      try{
+        if(typeof calc === 'function'){
+          calc();
+        }
+      }catch(e){
+        console.error(
+          '[V17] 전체 Calculation 오류:',
+          ds.name,
+          e
+        );
+      }
+
+    });
+
+
+    /*
+     * 전체 모드에서는 Raw 그래프를 다시 그린다.
+     */
+    try{
+      if(typeof rawRender === 'function'){
+        rawRender();
+      }
+    }catch(e){}
+
+
+    /*
+     * 전체 모드임을 유지
+     */
+    currentDatasetIndex = -1;
+
+    try{
+      if(typeof refreshDatasetSelect === 'function'){
+        refreshDatasetSelect();
+      }
+    }catch(e){}
+
+    try{
+      if(typeof updateCurrentDataBadge === 'function'){
+        updateCurrentDataBadge();
+      }
+    }catch(e){}
+
+    requestAnimationFrame(function(){
+
+      requestAnimationFrame(function(){
+
+        try{
+          if(typeof renderAll === 'function'){
+            renderAll();
+          }
+        }catch(e){}
+
+      });
+
+    });
+
+  };
+
+
+  /* ------------------------------------------------------------
+     6. 페이지 이동 시에도 현재 Dataset 유지
+     
+     왼쪽 2~6번을 눌러도 Raw Data에서 선택한 Dataset이
+     계속 유지되도록 한다.
+     ------------------------------------------------------------ */
+
+  window.getAlgorithmData = function(){
+
+    const ds = getCurrentDataset();
+
+    if(!ds){
+      return null;
+    }
+
+    return ds.data;
+  };
+
+
+  /* ------------------------------------------------------------
+     7. Dataset 선택기가 만들어지는 시점까지 기다린다.
+     ------------------------------------------------------------ */
+
+  function boot(){
+
+    if(
+      document.getElementById('datasetSelect')
+    ){
+
+      installDatasetSelector();
+
+      console.log(
+        '[V17] Dataset 공통 연결 완료'
+      );
+
+      return;
+    }
+
+    setTimeout(boot,100);
+  }
+
+
+  /* ------------------------------------------------------------
+     8. 기존 페이지가 모두 로드된 뒤 시작
+     ------------------------------------------------------------ */
+
+  if(document.readyState === 'loading'){
+
+    document.addEventListener(
+      'DOMContentLoaded',
+      boot
+    );
+
+  }else{
+
+    boot();
+
+  }
+
+})();
+</script>
+</body></html>
+</script>
+
+<!-- V17 Multi-Data Pipeline Patch -->
+<script>
+   // v17_patch.js 내용 전체
+</script>
+<script>
+/* ============================================================
+   V18
+   2~6번 항목에도 Dataset 선택창 추가
+   ============================================================ */
+
+(function(){
+
+  const pages = [
+    { page: 2, title: 'Edge 탐색' },
+    { page: 3, title: 'Image Edge' },
+    { page: 4, title: '기울기 보정' },
+    { page: 5, title: '데이터 연산' },
+    { page: 6, title: '판정' }
+  ];
+
+  /* ----------------------------------------------------------
+     Dataset 선택창 생성
+     ---------------------------------------------------------- */
+
+  function createDatasetSelectors(){
+
+    if(
+      typeof datasets === 'undefined' ||
+      !Array.isArray(datasets) ||
+      datasets.length === 0
+    ){
+      return;
+    }
+
+    pages.forEach(function(item){
+
+      /*
+       * page 요소 찾기
+       *
+       * 기존 페이지 구조가 id="page2", "page-2",
+       * data-page="2" 등일 수 있으므로 여러 방식으로 검색
+       */
+
+      let page =
+        document.getElementById('page'+item.page) ||
+        document.getElementById('page-'+item.page) ||
+        document.querySelector('[data-page="'+item.page+'"]');
+
+      if(!page){
+        return;
+      }
+
+      /* 이미 만들어졌으면 다시 만들지 않음 */
+      if(
+        page.querySelector('.v18-dataset-selector')
+      ){
+        updateDatasetOptions(
+          page.querySelector('.v18-dataset-selector')
+        );
+        return;
+      }
+
+      /* ------------------------------------------------------
+         선택창 박스
+         ------------------------------------------------------ */
+
+      const box=document.createElement('div');
+
+      box.className='v18-dataset-selector';
+
+      box.style.cssText=`
+        display:flex;
+        align-items:center;
+        gap:10px;
+        margin:10px 0 14px 0;
+        padding:10px 12px;
+        background:#111821;
+        border:1px solid #263342;
+        border-radius:8px;
+      `;
+
+
+      /* 제목 */
+
+      const label=document.createElement('span');
+
+      label.textContent='데이터 세트';
+
+      label.style.cssText=`
+        color:#9eabb8;
+        font-size:13px;
+        font-weight:600;
+        white-space:nowrap;
+      `;
+
+
+      /* SELECT */
+
+      const select=document.createElement('select');
+
+      select.className='v18-dataset-select';
+
+      select.style.cssText=`
+        min-width:220px;
+        height:32px;
+        padding:0 10px;
+        background:#0b1118;
+        color:#e8edf2;
+        border:1px solid #394958;
+        border-radius:5px;
+        outline:none;
+      `;
+
+      updateDatasetOptions(select);
+
+
+      /* ------------------------------------------------------
+         선택 이벤트
+         ------------------------------------------------------ */
+
+      select.addEventListener('change',function(){
+
+        const index=Number(this.value);
+
+        if(
+          !Number.isInteger(index) ||
+          index<0 ||
+          index>=datasets.length
+        ){
+          return;
+        }
+
+        console.log(
+          '[V18]',
+          item.title,
+          'Dataset:',
+          datasets[index].name
+        );
+
+
+        /*
+         * 현재 항목에서 사용할 Dataset 저장
+         */
+
+        window.v18PageDataset =
+          window.v18PageDataset || {};
+
+        window.v18PageDataset[item.page]=index;
+
+
+        /*
+         * 공통 D도 해당 Dataset으로 변경
+         */
+
+        currentDatasetIndex=index;
+
+        D=datasets[index].data;
+        N=D.x.length;
+
+
+        /*
+         * Edge
+         */
+
+        if(item.page===2){
+
+          if(typeof runThicknessEdge==='function'){
+            runThicknessEdge();
+          }
+
+        }
+
+
+        /*
+         * Image Edge
+         */
+
+        if(item.page===3){
+
+          if(typeof findImageEdges==='function'){
+            findImageEdges();
+          }
+
+        }
+
+
+        /*
+         * Slope
+         */
+
+        if(item.page===4){
+
+          if(typeof runSlope==='function'){
+            runSlope();
+          }
+
+        }
+
+
+        /*
+         * Calculation
+         */
+
+        if(item.page===5){
+
+          if(typeof calc==='function'){
+            calc();
+          }
+
+        }
+
+
+        /*
+         * Judgment
+         *
+         * 판정은 calc() 결과를 사용하므로
+         * 먼저 calc 실행
+         */
+
+        if(item.page===6){
+
+          if(typeof calc==='function'){
+            calc();
+          }
+
+        }
+
+
+        /*
+         * 화면 갱신
+         */
+
+        requestAnimationFrame(function(){
+
+          requestAnimationFrame(function(){
+
+            try{
+              if(typeof renderAll==='function'){
+                renderAll();
+              }
+            }catch(e){
+              console.error('[V18] render 오류',e);
+            }
+
+          });
+
+        });
+
+      });
+
+
+      box.appendChild(label);
+      box.appendChild(select);
+
+
+      /*
+       * 페이지의 가장 위에 추가
+       */
+
+      page.insertBefore(
+        box,
+        page.firstElementChild
+      );
+
+    });
+
+  }
+
+
+  /* ----------------------------------------------------------
+     Dataset 목록 갱신
+     ---------------------------------------------------------- */
+
+  function updateDatasetOptions(select){
+
+    if(!select) return;
+
+    const pageBox=
+      select.closest('.v18-dataset-selector');
+
+    let pageIndex=null;
+
+    /*
+     * 현재 select가 어느 페이지인지 찾기
+     */
+
+    pages.forEach(function(item){
+
+      const page =
+        document.getElementById('page'+item.page) ||
+        document.getElementById('page-'+item.page) ||
+        document.querySelector(
+          '[data-page="'+item.page+'"]'
+        );
+
+      if(
+        page &&
+        page.contains(select)
+      ){
+        pageIndex=item.page;
+      }
+
+    });
+
+
+    /*
+     * 현재 선택값 기억
+     */
+
+    let selected =
+      window.v18PageDataset &&
+      pageIndex !== null
+        ? window.v18PageDataset[pageIndex]
+        : 0;
+
+
+    select.innerHTML='';
+
+
+    /*
+     * 전체 데이터
+     */
+
+    const all=document.createElement('option');
+
+    all.value='-1';
+    all.textContent='전체 데이터 · 중첩 그래프';
+
+    select.appendChild(all);
+
+
+    /*
+     * 개별 Dataset
+     */
+
+    datasets.forEach(function(ds,index){
+
+      const option=document.createElement('option');
+
+      option.value=String(index);
+      option.textContent=ds.name || ('Data'+String(index+1).padStart(2,'0'));
+
+      select.appendChild(option);
+
+    });
+
+
+    /*
+     * 기본값
+     */
+
+    if(
+      Number.isInteger(selected) &&
+      selected>=0 &&
+      selected<datasets.length
+    ){
+
+      select.value=String(selected);
+
+    }else{
+
+      select.value='-1';
+
+    }
+
+  }
+
+
+  /* ----------------------------------------------------------
+     페이지가 만들어진 후 Dataset 선택창 설치
+     ---------------------------------------------------------- */
+
+  function boot(){
+
+    createDatasetSelectors();
+
+    /*
+     * Raw Data 업로드 후 datasets가 새로 만들어질 수 있으므로
+     * 일정 시간 동안 목록을 확인
+     */
+
+    setTimeout(function(){
+
+      if(
+        typeof datasets !== 'undefined' &&
+        datasets.length>0
+      ){
+        createDatasetSelectors();
+      }
+
+    },500);
+
+  }
+
+
+  if(document.readyState==='loading'){
+
+    document.addEventListener(
+      'DOMContentLoaded',
+      boot
+    );
+
+  }else{
+
+    boot();
+
+  }
+
+
+  /*
+   * Raw Data 업로드 후에도 선택창 갱신
+   */
+
+  const oldRefresh =
+    window.refreshDatasetSelect;
+
+  if(typeof oldRefresh==='function'){
+
+    window.refreshDatasetSelect=function(){
+
+      oldRefresh.apply(this,arguments);
+
+      setTimeout(function(){
+        createDatasetSelectors();
+      },50);
+
+    };
+
+  }
+
+
+})();
+</script>
+</body>
+</html>
